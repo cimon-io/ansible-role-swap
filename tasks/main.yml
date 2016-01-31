@@ -1,0 +1,22 @@
+---
+- name: "create extraswap file"
+  shell: "dd if=/dev/zero of=/extraswap bs=1M count={{ swap_size }} && mkswap /extraswap"
+  args:
+    creates: "/extraswap"
+  notify:
+    - enable swap
+  tags:
+    - swap
+
+- name: "edit fstab"
+  lineinfile:
+    dest: "/etc/fstab"
+    state: present
+    regexp: "extraswap"
+    line: "/extraswap         none            swap    sw                0       0"
+  notify:
+    - enable swap
+  tags:
+    - swap
+
+- meta: flush_handlers
